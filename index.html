@@ -6,8 +6,111 @@
 <title>:::~*~ luksgrin's xX corner of the net Xx ~*~:::</title>
 <link rel="stylesheet" href="style.css">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Ctext y='14' font-size='14'%3E%E2%9C%A7%3C/text%3E%3C/svg%3E">
+<style>
+  /* lock scroll while gated — the overlay covers the content visually */
+  body:not(.unlocked) { overflow: hidden; }
+
+  #login-gate {
+    position: fixed; inset: 0;
+    background:
+      radial-gradient(circle at 50% 35%, #2a0044 0%, #08000f 75%),
+      #000;
+    display: flex; align-items: center; justify-content: center;
+    z-index: 9999;
+    color: #fff;
+    font-family: "Trebuchet MS", "Comic Sans MS", cursive, sans-serif;
+  }
+  body.unlocked #login-gate { display: none; }
+
+  #login-gate .gate-card {
+    background: linear-gradient(180deg, #1a0033 0%, #0a0014 100%);
+    border: 2px solid #ff00ff;
+    box-shadow: 0 0 18px #ff00ff, inset 0 0 24px rgba(0,255,255,0.18);
+    padding: 28px 32px 22px;
+    text-align: center;
+    width: min(90vw, 380px);
+  }
+  #login-gate h1 {
+    font-family: Georgia, serif; font-style: italic;
+    font-size: 26px; margin: 0 0 4px;
+    background: linear-gradient(90deg,#ff66cc,#ff00ff,#00ffff,#ffff66);
+    -webkit-background-clip: text; background-clip: text; color: transparent;
+  }
+  #login-gate .gate-sub {
+    font-size: 11px; letter-spacing: 1.5px;
+    color: #ff99ff; margin-bottom: 18px;
+  }
+  #login-gate input[type="password"] {
+    background: #000; color: #0ff;
+    border: 1px solid #00ffff;
+    padding: 8px 10px;
+    font-family: monospace; font-size: 14px;
+    width: 100%; box-sizing: border-box;
+    text-align: center; letter-spacing: 2px;
+    outline: none;
+  }
+  #login-gate input[type="password"]:focus {
+    box-shadow: 0 0 8px #00ffff;
+  }
+  #login-gate button {
+    margin-top: 12px;
+    background: linear-gradient(180deg,#ff66cc,#cc0066);
+    color: #fff;
+    border: 1px solid #ff00ff;
+    padding: 6px 18px;
+    font-family: Georgia, serif; font-style: italic; font-size: 14px;
+    cursor: pointer;
+  }
+  #login-gate button:hover { filter: brightness(1.15); }
+  #login-gate .gate-error {
+    color: #ff3366; margin: 12px 0 0; min-height: 16px;
+    font-family: monospace; font-size: 12px;
+  }
+  #login-gate .gate-foot {
+    margin-top: 14px; font-size: 10px; color: #aa77cc; font-family: monospace;
+  }
+  @keyframes gate-blink { 50% { opacity: 0; } }
+  #login-gate .blink-star {
+    color: #ff00ff;
+    animation: gate-blink 1s steps(2,end) infinite;
+  }
+</style>
 </head>
 <body>
+
+<!-- ========== password gate ========== -->
+<div id="login-gate">
+  <div class="gate-card">
+    <h1>~*~ enter password ~*~</h1>
+    <div class="gate-sub"><span class="blink-star">&#x2726;</span> only the worthy may pass <span class="blink-star">&#x2726;</span></div>
+    <form onsubmit="checkPassword(event)">
+      <input id="password" type="password" autocomplete="off" autofocus>
+      <div><button type="submit">&hearts; enter &hearts;</button></div>
+    </form>
+    <p id="error" class="gate-error"></p>
+    <div class="gate-foot">[ client side fun only ]</div>
+  </div>
+</div>
+<script>
+  async function sha256(text) {
+    const data = new TextEncoder().encode(text);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+    return [...new Uint8Array(hashBuffer)]
+      .map(b => b.toString(16).padStart(2, "0"))
+      .join("");
+  }
+  async function checkPassword(e) {
+    if (e) e.preventDefault();
+    const input = document.getElementById("password").value;
+    const correctHash = "814e1e6f0fd09256f118fd8916ff6cf151452fe23f2b799c6482fe68f74a64e4";
+    const inputHash = await sha256(input);
+    if (inputHash === correctHash) {
+      document.body.classList.add("unlocked");
+    } else {
+      document.getElementById("error").textContent = "wrong password — try again ~";
+    }
+  }
+</script>
 
 <!-- ========== top banner ========== -->
 <div id="top-banner">
